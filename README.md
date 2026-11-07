@@ -1,7 +1,7 @@
 # LeadRescue
 
 **Never lose a customer to a missed call again.**
-
+web link - https://leadrescue-nu.vercel.app
 A Next.js, React, TypeScript and Tailwind SaaS foundation for consent-based WhatsApp and SMS missed-call recovery. This repository implements **Phase 1** of the requested build. It contains a real server-side authentication/onboarding backend and a separate, credential-free demo dashboard.
 
 ## Just want to use the app?
