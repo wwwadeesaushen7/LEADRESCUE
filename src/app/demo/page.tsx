@@ -1,7 +1,7 @@
-import { Dashboard } from "@/components/dashboard";
+import { WorkspaceApp } from "@/components/workspace/app";
 import { demoBusiness } from "@/lib/demo/session";
 export const metadata = { title: "Demo workspace" };
 export default async function Page() {
   const business = await demoBusiness();
-  return <Dashboard demo name={business.name} />;
+  return <WorkspaceApp demo name={business.name} business={business} />;
 }

@@ -1,26 +1,40 @@
 "use client";
 import { useState } from "react";
 import { ArrowRight, Check, Building2, Clock, MapPin } from "lucide-react";
-import { industries, type BusinessInput } from "@/lib/validation";
+import {
+  industries,
+  businessSchema,
+  type BusinessInput,
+} from "@/lib/validation";
 export function BusinessForm({
   demo,
   initial,
+  onSave,
 }: {
   demo: boolean;
   initial?: BusinessInput;
+  onSave?: (data: BusinessInput) => Promise<void>;
 }) {
   const [days, setDays] = useState(initial?.workingDays || [1, 2, 3, 4, 5]);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const [saved, setSaved] = useState(false);
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
+    setSaved(false);
     setPending(true);
     const data = {
       ...Object.fromEntries(new FormData(e.currentTarget)),
       workingDays: days,
     };
     try {
+      if (onSave) {
+        await onSave(businessSchema.parse(data));
+        setSaved(true);
+        setPending(false);
+        return;
+      }
       const r = await fetch(demo ? "/api/demo" : "/api/business", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -129,20 +143,17 @@ export function BusinessForm({
           name="timezone"
           defaultValue={initial?.timezone || "America/New_York"}
         >
-          {[
-            "America/New_York",
-            "America/Chicago",
-            "America/Denver",
-            "America/Phoenix",
-            "America/Los_Angeles",
-            "America/Anchorage",
-            "Pacific/Honolulu",
-            "Asia/Colombo",
-            "Europe/London",
-            "UTC",
-          ].map((t) => (
-            <option key={t}>{t}</option>
-          ))}
+          {Array.from(
+            new Set([
+              "UTC",
+              initial?.timezone || "America/New_York",
+              ...Intl.supportedValuesOf("timeZone"),
+            ]),
+          )
+            .sort()
+            .map((t) => (
+              <option key={t}>{t}</option>
+            ))}
         </select>
       </label>
       <fieldset className="days-field">
@@ -186,9 +197,14 @@ export function BusinessForm({
         </label>
       </div>
       <p className="form-note">
-        These hours apply to each selected day. Overnight and per-day schedules
-        are planned for Phase 2.
+        These hours apply to each selected day. Use a closing time later than
+        the opening time on the same day.
       </p>
+      {saved && (
+        <p role="status" className="notice">
+          Business details saved.
+        </p>
+      )}
       {error && (
         <div role="alert" className="notice error">
           {error}
@@ -201,7 +217,13 @@ export function BusinessForm({
             : "You can connect communication providers in a later phase."}
         </span>
         <button className="button" disabled={pending}>
-          {pending ? "Creating…" : demo ? "Open my demo" : "Create business"}
+          {pending
+            ? "Saving…"
+            : onSave
+              ? "Save business details"
+              : demo
+                ? "Open my demo"
+                : "Create business"}
           <ArrowRight size={17} />
         </button>
       </div>

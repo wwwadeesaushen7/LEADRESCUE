@@ -1608,6 +1608,8 @@ button:hover:not(:disabled) {
   border-radius: 0 !important;
 }
 .table-scroll {
+  /* Keep wide tables inside their scrollport on mobile browsers. */
+  contain: inline-size layout paint;
   overflow: auto;
 }
 table {
@@ -2267,6 +2269,7 @@ small.muted {
     gap: 12px;
   }
   .final-cta {
+    width: calc(100% - 50px);
     margin-left: 25px;
     margin-right: 25px;
   }
@@ -2719,6 +2722,7 @@ small.muted {
     font-size: 12px;
   }
   .final-cta {
+    width: calc(100% - 44px);
     margin-left: 22px;
     margin-right: 22px;
     padding: 40px 22px;
@@ -3126,5 +3130,724 @@ html[data-theme="dark"] .theme-moon {
   }
   .app-entry h1 {
     font-size: 34px;
+  }
+}
+
+/* Business tools */
+.workspace-enter {
+  animation: workspace-arrive 0.45s ease-out;
+}
+.records-card {
+  overflow: hidden;
+}
+.records-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 22px;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.records-toolbar .search-input {
+  flex: 1;
+  min-width: 200px;
+}
+.records-toolbar select {
+  width: auto;
+}
+.pipeline-strip {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 24px;
+}
+.pipeline-strip button {
+  text-align: left;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  transition:
+    transform 0.2s,
+    border-color 0.2s;
+}
+.pipeline-strip button:hover {
+  transform: translateY(-3px);
+  border-color: var(--purple);
+}
+.pipeline-strip button.selected {
+  background: var(--soft);
+  border-color: var(--purple);
+}
+.pipeline-strip span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  min-height: 34px;
+}
+.pipeline-strip strong {
+  font-size: 25px;
+  line-height: 1.2;
+}
+.customer-button {
+  text-align: left;
+  padding: 4px 0;
+}
+.customer-button small {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+}
+.customer-button:hover strong {
+  color: var(--purple);
+}
+.pagination {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.workspace-dialog {
+  margin: auto;
+  width: min(620px, calc(100% - 32px));
+  max-height: calc(100dvh - 48px);
+  overflow: auto;
+  padding: 28px;
+  color: var(--text);
+  box-shadow: 0 24px 100px #17112f35;
+  animation: dialog-arrive 0.22s ease-out;
+}
+.workspace-dialog::backdrop {
+  background: #14102566;
+  backdrop-filter: blur(5px);
+}
+.workspace-dialog h2,
+.calendar-card h2,
+.appointment-list h2,
+.thread-header h2 {
+  font-size: 20px;
+  letter-spacing: -0.03em;
+}
+.workspace-dialog > p {
+  margin: 18px 0;
+}
+.workspace-form {
+  display: grid;
+  gap: 18px;
+  margin-top: 24px;
+}
+.workspace-form label,
+.assignment-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 12px;
+}
+.workspace-form label small {
+  color: var(--muted);
+  font-size: 10px;
+}
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.setup-needed {
+  padding: 32px;
+}
+.setup-needed h1 {
+  font-size: 30px;
+}
+.setup-needed p {
+  margin: 16px 0;
+}
+.profile-settings {
+  margin-top: 24px;
+}
+.profile-settings > a {
+  display: inline-block;
+  margin: 16px 0;
+}
+.notice-item {
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+.notice-item.unread {
+  border-left: 2px solid var(--purple);
+  padding-left: 10px;
+}
+.notification-popover {
+  max-height: 70dvh;
+  overflow: auto;
+  z-index: 40;
+}
+.inbox-notice {
+  margin-bottom: 20px;
+}
+.inbox-layout {
+  display: grid;
+  grid-template-columns: minmax(230px, 0.75fr) minmax(0, 1.65fr);
+  min-height: 580px;
+  overflow: hidden;
+}
+.conversation-list {
+  border-right: 1px solid var(--line);
+}
+.conversation-filters {
+  padding: 18px;
+  display: grid;
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.conversation-filters .search-input {
+  width: 100%;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.checkbox-label input {
+  accent-color: var(--purple);
+}
+.conversation-preview {
+  width: 100%;
+  padding: 20px 18px;
+  display: flex;
+  gap: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+.conversation-preview > span:last-child {
+  min-width: 0;
+  flex: 1;
+}
+.conversation-preview strong {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+.conversation-preview small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  max-width: 220px;
+  font-size: 11px;
+  margin: 4px 0;
+}
+.conversation-preview em {
+  font-style: normal;
+  font-size: 10px;
+  color: var(--purple);
+}
+.conversation-preview.selected {
+  background: var(--soft);
+  box-shadow: inset 3px 0 var(--purple);
+}
+.unread-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--purple);
+}
+.conversation-thread {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.thread-header {
+  padding: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.thread-header p {
+  font-size: 11px;
+  margin-top: 6px;
+}
+.assignment-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  padding: 12px 22px;
+  border-bottom: 1px solid var(--line);
+}
+.assignment-form label {
+  flex: 1;
+}
+.assignment-form input {
+  padding: 7px 10px;
+  font-size: 11px;
+}
+.assignment-form button {
+  margin-bottom: 7px;
+}
+.message-history {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+  padding: 25px;
+  background: var(--surface-alt);
+  min-height: 280px;
+  max-height: 480px;
+  overflow: auto;
+}
+.message-bubble {
+  max-width: 88%;
+  border-radius: 12px;
+  padding: 13px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  animation: message-arrive 0.28s ease-out;
+  overflow-wrap: anywhere;
+}
+.message-bubble.outbound {
+  align-self: flex-end;
+  background: var(--soft);
+  border-bottom-right-radius: 3px;
+}
+.message-bubble.inbound {
+  align-self: flex-start;
+  border-bottom-left-radius: 3px;
+}
+.message-bubble p {
+  color: var(--text);
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+.message-bubble small {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 9px;
+  margin-top: 7px;
+}
+.message-bubble .icon-button {
+  width: 24px;
+  height: 24px;
+}
+.message-composer {
+  padding: 20px;
+  border-top: 1px solid var(--line);
+}
+.message-composer textarea {
+  width: 100%;
+  resize: vertical;
+  font-size: 12px;
+}
+.composer-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.composer-actions small {
+  margin-right: auto;
+  color: var(--muted);
+  font-size: 10px;
+}
+.composer-actions .button {
+  font-size: 11px;
+  padding: 10px 12px;
+  gap: 8px;
+}
+.thread-empty {
+  padding: 35px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+  color: var(--purple);
+  background: radial-gradient(ellipse at center, var(--soft), transparent 70%);
+}
+.thread-empty h2 {
+  font-size: 27px;
+  color: var(--text);
+  max-width: 300px;
+}
+.calendar-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.calendar-card,
+.appointment-list {
+  padding: 24px;
+}
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 5px;
+  margin-top: 25px;
+}
+.calendar-weekday {
+  text-align: center;
+  color: var(--muted);
+  font-size: 10px;
+  margin-bottom: 12px;
+}
+.calendar-day {
+  aspect-ratio: 1;
+  min-height: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 12px;
+  gap: 3px;
+}
+.calendar-day:hover {
+  background: var(--surface-alt);
+}
+.calendar-day.today {
+  border-color: var(--purple);
+  color: var(--purple);
+}
+.calendar-day.selected {
+  background: var(--purple);
+  color: white;
+}
+.calendar-marker {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  line-height: 1;
+}
+.calendar-marker i {
+  width: 4px;
+  height: 4px;
+  background: currentColor;
+  border-radius: 50%;
+}
+.calendar-marker small {
+  font-size: 8px;
+}
+.appointment-list select {
+  width: auto;
+  max-width: 160px;
+  font-size: 11px;
+  padding: 8px;
+}
+.appointment-item {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+}
+.appointment-item:last-child {
+  border-bottom: 0;
+}
+.appointment-icon {
+  display: grid;
+  place-items: center;
+  background: var(--soft);
+  color: var(--purple);
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 12px;
+}
+.appointment-item strong,
+.appointment-item small {
+  display: block;
+}
+.appointment-item strong {
+  font-size: 13px;
+}
+.appointment-item small {
+  font-size: 11px;
+  color: var(--muted);
+}
+.appointment-time {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: var(--muted);
+  margin: 9px 0;
+  flex-wrap: wrap;
+}
+.appointment-item:hover strong {
+  color: var(--purple);
+}
+.stat-card > strong .stat-number {
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  color: var(--text);
+  border: 0;
+  padding: 0;
+}
+.workspace-skeleton .skeleton-line {
+  display: block;
+  height: 35px;
+  width: 50%;
+  background: var(--line);
+  margin: 32px 0;
+  border-radius: 8px;
+}
+.skeleton-card {
+  height: 150px;
+  background: linear-gradient(
+    100deg,
+    var(--surface) 30%,
+    var(--surface-alt) 50%,
+    var(--surface) 70%
+  );
+  background-size: 250% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+/* Motion uses transforms and opacity. Controls and reduced-motion stop all motion. */
+.stat-card {
+  animation: workspace-arrive 0.5s both;
+  transition:
+    transform 0.22s,
+    box-shadow 0.22s;
+}
+.stat-card:nth-child(2) {
+  animation-delay: 0.06s;
+}
+.stat-card:nth-child(3) {
+  animation-delay: 0.12s;
+}
+.stat-card:nth-child(4) {
+  animation-delay: 0.18s;
+}
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+}
+.call-alert {
+  animation: gentle-float 5s ease-in-out infinite;
+}
+.recovered-float {
+  animation: gentle-float 6s ease-in-out 1s infinite;
+}
+.floating-tag {
+  animation: gentle-float 7s ease-in-out 0.5s infinite;
+}
+.orbit-two {
+  animation: orbit-turn 65s linear infinite;
+}
+.hero-copy {
+  animation: workspace-arrive 0.65s ease-out;
+}
+.hero-visual {
+  animation: workspace-arrive 0.85s ease-out;
+}
+.funnel-bars > div > div {
+  transform-origin: left;
+  animation: bar-grow 0.7s ease-out both;
+}
+.spin {
+  animation: orbit-turn 1s linear infinite;
+}
+@keyframes workspace-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes dialog-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes message-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes gentle-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -8px;
+  }
+}
+@keyframes orbit-turn {
+  to {
+    rotate: 360deg;
+  }
+}
+@keyframes bar-grow {
+  from {
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+@keyframes shimmer {
+  to {
+    background-position: -150% 0;
+  }
+}
+html[data-motion="off"] *,
+html[data-motion="off"] *::before,
+html[data-motion="off"] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+@media (max-width: 1150px) {
+  .pipeline-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .calendar-layout {
+    grid-template-columns: 1fr;
+  }
+  .calendar-day {
+    aspect-ratio: auto;
+    min-height: 65px;
+  }
+}
+@media (max-width: 700px) {
+  .inbox-layout {
+    grid-template-columns: 1fr;
+  }
+  .conversation-list {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    max-height: 290px;
+    overflow: auto;
+  }
+  .conversation-preview {
+    padding: 12px 16px;
+  }
+  .conversation-filters {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .conversation-filters .search-input {
+    grid-column: 1/-1;
+  }
+  .conversation-preview small {
+    max-width: none;
+  }
+  .thread-header,
+  .message-history,
+  .message-composer {
+    padding: 16px;
+  }
+  .message-bubble {
+    max-width: 94%;
+  }
+  .assignment-form {
+    padding: 12px 16px;
+  }
+  .pipeline-strip {
+    gap: 8px;
+  }
+  .pipeline-strip button {
+    padding: 12px;
+  }
+  .pipeline-strip span {
+    font-size: 10px;
+  }
+  .records-toolbar {
+    padding: 16px;
+  }
+  .records-toolbar .search-input {
+    min-width: 100%;
+  }
+  .records-toolbar select {
+    flex: 1;
+  }
+  .records-toolbar .button {
+    padding: 10px 12px;
+    font-size: 11px;
+  }
+  .calendar-card,
+  .appointment-list {
+    padding: 18px;
+  }
+  .calendar-day {
+    min-height: 45px;
+  }
+  .calendar-card h2,
+  .appointment-list h2 {
+    font-size: 17px;
+  }
+  .workspace-dialog {
+    padding: 22px;
+  }
+  .workspace-header-actions {
+    gap: 3px;
+  }
+  .workspace-header .mode-indicator {
+    display: none;
+  }
+  .public-header .nav-actions {
+    gap: 6px;
+  }
+  .public-header .nav-actions .motion-toggle {
+    width: 27px;
+  }
+  .workspace-dialog .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .workspace-dialog .span-two {
+    grid-column: auto;
+  }
+  .workspace-dialog .form-actions .button {
+    flex: 1;
+  }
+  .pipeline-strip strong {
+    font-size: 22px;
+  }
+  .message-history {
+    max-height: 400px;
+  }
+  .stat-card > strong .stat-number {
+    font-size: inherit;
   }
 }

@@ -1,4 +1,5 @@
 "use client";
+import { MotionToggle } from "./motion-toggle";
 import Link from "next/link";
 import { Menu, X, ArrowUpRight } from "lucide-react";
 import { useState } from "react";
@@ -31,6 +32,7 @@ export function PublicNav() {
           </Link>
         </nav>
         <div className="nav-actions">
+          <MotionToggle />
           <ThemeToggle />
           <Link className="login-link" href="/login">
             Log in

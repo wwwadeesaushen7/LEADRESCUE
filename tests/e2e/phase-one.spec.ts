@@ -8,7 +8,9 @@ test("landing, theme, pricing and navigation work without credentials", async ({
   );
   expect(
     await page.evaluate(
-      () => document.documentElement.scrollWidth <= innerWidth,
+      () =>
+        document.documentElement.scrollWidth <=
+        document.documentElement.clientWidth,
     ),
   ).toBe(true);
   await page.getByRole("button", { name: "Toggle color theme" }).click();
@@ -77,7 +79,9 @@ test("dashboard supports search, chart periods, setup details and notifications"
   await expect(page.getByRole("dialog")).toHaveCount(0);
   expect(
     await page.evaluate(
-      () => document.documentElement.scrollWidth <= innerWidth,
+      () =>
+        document.documentElement.scrollWidth <=
+        document.documentElement.clientWidth,
     ),
   ).toBe(true);
 });

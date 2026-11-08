@@ -19,7 +19,7 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{document.documentElement.dataset.theme=localStorage.getItem('leadrescue-theme')||'light'}catch(e){}",
+              "try{document.documentElement.dataset.theme=localStorage.getItem('leadrescue-theme')||'light';document.documentElement.dataset.motion=localStorage.getItem('leadrescue-motion')||'on'}catch(e){}",
           }}
         />
       </head>

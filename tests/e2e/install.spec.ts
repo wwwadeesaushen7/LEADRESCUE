@@ -11,7 +11,9 @@ test("install page explains Android and computer installation without a browser 
   await expect(page.getByText("Internet access is required.")).toBeVisible();
   expect(
     await page.evaluate(
-      () => document.documentElement.scrollWidth <= innerWidth,
+      () =>
+        document.documentElement.scrollWidth <=
+        document.documentElement.clientWidth,
     ),
   ).toBe(true);
   await page.getByRole("link", { name: "Continue in your browser" }).click();
