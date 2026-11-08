@@ -15,6 +15,7 @@ import {
   type Command,
 } from "@/lib/workspace/model";
 import { seedWorkspace, applyDemoCommand } from "@/lib/workspace/demo";
+import { ensureSimulation } from "@/lib/simulation/engine";
 const KEY = "leadrescue-workspace-v2";
 type Context = {
   data: WorkspaceData;
@@ -68,6 +69,7 @@ export function WorkspaceProvider({
               throw new Error(
                 "Demo storage is invalid. Clear site data to start again.",
               );
+            ensureSimulation(next);
             if (syncBusiness)
               next.business = business || { ...next.business, name };
             localStorage.setItem(KEY, JSON.stringify(next));
@@ -126,6 +128,10 @@ export function WorkspaceProvider({
         }
         localStorage.setItem(KEY, JSON.stringify(next));
       } else {
+        if (cmd.action === "simulation")
+          throw new Error(
+            "Open the separate demo workspace to use the simulator.",
+          );
         const response = await fetch("/api/workspace", {
           method: "POST",
           headers: { "Content-Type": "application/json" },

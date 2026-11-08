@@ -56,11 +56,13 @@ test("dashboard supports search, chart periods, setup details and notifications"
   await page.goto("/demo");
   await page.getByRole("button", { name: "Month", exact: true }).click();
   await expect(
-    page.getByRole("button", { name: /1 Nov: 54 calls/ }),
+    page.getByRole("button", { name: /1–5: 0 calls/ }),
   ).toBeVisible();
-  await page.getByLabel("Search missed calls").fill("Sophia");
-  await expect(page.getByText("Sophia Chen", { exact: true })).toBeVisible();
-  await expect(page.getByText("Olivia Martin", { exact: true })).toHaveCount(0);
+  await expect(
+    page.getByText(
+      "Start a call in the recovery demo to see its outcome here.",
+    ),
+  ).toBeVisible();
   await page.getByLabel("Search missed calls").fill("does-not-exist");
   await expect(page.getByText("No matching calls")).toBeVisible();
   await page

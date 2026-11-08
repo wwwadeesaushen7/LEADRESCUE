@@ -25,13 +25,19 @@ import { ThemeToggle } from "../theme-toggle";
 import { Dashboard } from "../dashboard";
 import { BusinessForm } from "../business-form";
 import { WorkspaceProvider, useWorkspace } from "./provider";
+import { Simulator } from "./simulator";
 import { Leads } from "./leads";
 import { Inbox } from "./inbox";
 import { Appointments } from "./appointments";
 import { Modal, FormError, errorText } from "./modal";
 import type { BusinessInput } from "@/lib/validation";
 export type Section =
-  "Overview" | "Leads" | "Inbox" | "Appointments" | "Settings";
+  | "Overview"
+  | "Leads"
+  | "Inbox"
+  | "Appointments"
+  | "Settings"
+  | "Recovery demo";
 export function WorkspaceApp({
   name,
   demo = false,
@@ -132,6 +138,15 @@ function Shell({
               {section === label && <span className="selected-dot" />}
             </Link>
           ))}
+          <Link
+            href="/demo/simulator"
+            className={`sidebar-link ${section === "Recovery demo" ? "active" : ""}`}
+            aria-current={section === "Recovery demo" ? "page" : undefined}
+            onClick={() => setMenu(false)}
+          >
+            <FlaskConical size={19} />
+            Recovery demo
+          </Link>
           <button
             className="sidebar-link"
             onClick={() => {
@@ -322,6 +337,8 @@ function Shell({
             </section>
           ) : section === "Overview" ? (
             <Dashboard onGuide={setGuide} />
+          ) : section === "Recovery demo" && demo ? (
+            <Simulator />
           ) : section === "Leads" ? (
             <Leads />
           ) : section === "Inbox" ? (
@@ -367,8 +384,15 @@ function Shell({
           </p>
           <div className="notice">
             No messages are sent from the live inbox yet. The demo lets you try
-            conversations with fictional replies.
+            the complete recovery flow with fictional calls and replies.
           </div>
+          <Link
+            href="/demo/simulator"
+            className="button secondary full"
+            onClick={() => setGuide("")}
+          >
+            Try the recovery demo
+          </Link>
           <button className="button full" onClick={() => setGuide("")}>
             Got it
           </button>

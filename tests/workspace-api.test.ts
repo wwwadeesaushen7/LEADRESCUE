@@ -108,6 +108,29 @@ describe("Workspace API authorization and boundaries", () => {
       ).status,
     ).toBe(400);
   });
+  it("rejects every simulator command before any database write", async () => {
+    for (const type of [
+      "prepare",
+      "start",
+      "finish",
+      "delivery",
+      "reply",
+      "permissions",
+      "settings",
+      "book",
+      "won",
+      "advance",
+      "process",
+      "select",
+    ]) {
+      expect(
+        (await POST(request({ action: "simulation", data: { type } }))).status,
+      ).toBe(400);
+    }
+    expect(mock.from).not.toHaveBeenCalled();
+    expect(mock.rpc).not.toHaveBeenCalled();
+    expect(mock.load).not.toHaveBeenCalled();
+  });
   it("forces live messages to unsent drafts and rejects invalid data before writes", async () => {
     const insert = vi.fn().mockResolvedValue({ error: null });
     mock.from.mockReturnValue({ insert });

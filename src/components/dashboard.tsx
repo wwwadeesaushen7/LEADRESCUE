@@ -15,14 +15,17 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { ActivityChart } from "./activity-chart";
-import { demoCalls } from "@/lib/demo/data";
+import { RecoveryMetrics } from "./workspace/simulator";
+import { displayTime } from "@/lib/workspace/time";
+import { useRouter } from "next/navigation";
 import { useWorkspace } from "./workspace/provider";
 import { summary } from "@/lib/workspace/model";
 import { AnimatedNumber } from "./workspace/motion";
 export function Dashboard({ onGuide }: { onGuide: (label: string) => void }) {
-  const { data, demo } = useWorkspace(),
+  const { data, demo, run } = useWorkspace(),
     name = data.business.name,
     counts = summary(data);
+  const router = useRouter();
   const booked = new Set(
     data.appointments
       .filter((a) => a.status !== "Canceled")
@@ -55,11 +58,38 @@ export function Dashboard({ onGuide }: { onGuide: (label: string) => void }) {
   const completed = steps.filter((s) => s.done).length;
   const [search, setSearch] = useState("");
   const calls = demo
-    ? demoCalls.filter((c) =>
-        `${c.name} ${c.phone} ${c.channel}`
-          .toLowerCase()
-          .includes(search.toLowerCase()),
-      )
+    ? (data.simulation?.calls || [])
+        .filter((c) => c.missed)
+        .map((c) => {
+          const lead = data.leads.find((l) => l.id === c.lead_id)!;
+          return {
+            id: c.id,
+            name: lead.name,
+            phone: lead.phone,
+            initials: lead.name.slice(0, 2),
+            color: "lavender",
+            channel: c.channel || "None",
+            status:
+              c.won_at && lead.status === "Won"
+                ? "Won"
+                : c.appointment_id &&
+                    data.appointments.some(
+                      (a) =>
+                        a.id === c.appointment_id && a.status !== "Canceled",
+                    )
+                  ? "Booked"
+                  : c.replied_at
+                    ? "Replied"
+                    : c.recovery[0].toUpperCase() + c.recovery.slice(1),
+            time: displayTime(c.created_at, data.business.timezone),
+            service: c.reason,
+          };
+        })
+        .filter((c) =>
+          `${c.name} ${c.phone} ${c.channel}`
+            .toLowerCase()
+            .includes(search.toLowerCase()),
+        )
     : [];
   const setFeature = onGuide;
   return (
@@ -124,8 +154,18 @@ export function Dashboard({ onGuide }: { onGuide: (label: string) => void }) {
           </article>
         ))}
       </div>
+      <div className="notice simulator-notice">
+        <span>
+          <strong>See a missed call turn into a conversation.</strong> Try the
+          recovery simulator with fictional customers.
+        </span>
+        <Link className="button secondary" href="/demo/simulator">
+          Try recovery demo <ArrowUpRight size={15} />
+        </Link>
+      </div>
+      {demo && <RecoveryMetrics />}
       <div className="dashboard-mid">
-        <ActivityChart demo={demo} />
+        <ActivityChart demo={demo} workspace={data} />
         <section className="card setup-card">
           <div className="section-heading">
             <h3>Your next steps</h3>
@@ -185,7 +225,7 @@ export function Dashboard({ onGuide }: { onGuide: (label: string) => void }) {
             </thead>
             <tbody>
               {calls.map((c) => (
-                <tr key={c.name}>
+                <tr key={c.id}>
                   <td>
                     <div className="customer-cell">
                       <span className={`avatar ${c.color}`}>{c.initials}</span>
@@ -220,7 +260,21 @@ export function Dashboard({ onGuide }: { onGuide: (label: string) => void }) {
                     <button
                       className="icon-button"
                       aria-label={`View ${c.name}`}
-                      onClick={() => setFeature(`${c.name}: ${c.service}`)}
+                      onClick={async () => {
+                        try {
+                          await run({
+                            action: "simulation",
+                            data: { type: "select", call_id: c.id },
+                          });
+                          router.push("/demo/simulator");
+                        } catch (e) {
+                          setFeature(
+                            e instanceof Error
+                              ? e.message
+                              : "Could not open the call.",
+                          );
+                        }
+                      }}
                     >
                       <ArrowUpRight size={17} />
                     </button>
@@ -240,14 +294,18 @@ export function Dashboard({ onGuide }: { onGuide: (label: string) => void }) {
               <p>
                 {search
                   ? "Try a different name, number, or channel."
-                  : "Your real call activity will appear once a supported telephony integration is connected."}
+                  : demo
+                    ? "Start a call in the recovery demo to see its outcome here."
+                    : "Your real call activity will appear once a supported telephony integration is connected."}
               </p>
             </div>
           )}
         </div>
         <div className="table-footer">
           <span>
-            {demo ? "4 sample calls · fictional contacts" : "No calls recorded"}
+            {demo
+              ? `${data.simulation?.calls.filter((c) => c.missed).length || 0} simulated missed calls · fictional contacts`
+              : "No calls recorded"}
           </span>
           <span>
             <ShieldCheck size={13} /> Consent comes first
@@ -318,7 +376,7 @@ export function Dashboard({ onGuide }: { onGuide: (label: string) => void }) {
         <span>
           <ShieldCheck size={14} />{" "}
           {demo
-            ? "Sample outcomes illustrate the product. A sent message is not a recovered customer."
+            ? "These outcomes come from your simulated calls. A sent message is not a recovered customer."
             : "Your business data is protected by Supabase Row Level Security."}
         </span>
         <span>Made for the work you do.</span>

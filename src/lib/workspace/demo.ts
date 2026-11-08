@@ -1,4 +1,12 @@
 import {
+  applySimulationCommand,
+  ensureSimulation,
+  validateSimulatedOutbound,
+  recordSimulatedInbound,
+  linkSimulationAppointment,
+  syncSimulationWin,
+} from "@/lib/simulation/engine";
+import {
   emptyWorkspace,
   leadSchema,
   appointmentSchema,
@@ -95,14 +103,21 @@ export function seedWorkspace(business: BusinessInput): WorkspaceData {
       created_at: now,
     },
   ];
+  ensureSimulation(data);
   return data;
 }
 export function applyDemoCommand(
   current: WorkspaceData,
   cmd: Command,
 ): WorkspaceData {
-  const data = structuredClone(current),
-    now = new Date().toISOString();
+  if (cmd.action === "simulation")
+    return applySimulationCommand(current, cmd.data);
+  const data = structuredClone(current);
+  const simulation = ensureSimulation(data);
+  simulation.clock = new Date(
+    Math.max(Date.parse(simulation.clock) + 1, Date.now()),
+  ).toISOString();
+  const now = simulation.clock;
   const notify = (title: string) =>
     data.notifications.unshift({
       id: crypto.randomUUID(),
@@ -127,6 +142,7 @@ export function applyDemoCommand(
         created_at: now,
         updated_at: now,
       });
+    if (cmd.id) syncSimulationWin(data, cmd.id);
     notify(`${cmd.id ? "Updated" : "New lead"}: ${parsed.name}`);
   } else if (cmd.action === "saveAppointment") {
     const parsed = appointmentSchema.parse(cmd.data);
@@ -154,6 +170,7 @@ export function applyDemoCommand(
         business_id: BUSINESS,
         created_at: now,
       });
+    linkSimulationAppointment(data, cmd.id || data.appointments[0].id);
     notify(`Appointment ${parsed.status.toLowerCase()}: ${parsed.title}`);
   } else if (cmd.action === "createConversation") {
     const parsed = conversationSchema.parse(cmd.data);
@@ -184,21 +201,40 @@ export function applyDemoCommand(
       );
     if (!conversation) throw new Error("Conversation not found.");
     const incoming = cmd.action === "simulateReply";
+    if (!incoming) validateSimulatedOutbound(data, conversation.id);
     if (cmd.action === "saveMessage" && cmd.id) {
       const message = data.messages.find(
         (m) => m.id === cmd.id && m.conversation_id === parsed.conversation_id,
       );
       if (!message) throw new Error("Message not found.");
+      if (message.direction !== "outbound" || message.simulation_call_id)
+        throw new Error(
+          "Sent simulator history cannot be edited. Write a new reply.",
+        );
       message.body = parsed.body;
-    } else
+    } else {
+      const call = simulation.calls.find(
+        (c) =>
+          c.lead_id === conversation.lead_id &&
+          c.channel === conversation.channel &&
+          ["sent", "delivered"].includes(c.recovery),
+      );
       data.messages.push({
         ...parsed,
         id: crypto.randomUUID(),
         business_id: BUSINESS,
         direction: incoming ? "inbound" : "outbound",
         status: "simulated",
+        ...(call
+          ? {
+              simulation_call_id: call.id,
+              ...(!incoming ? { delivery_status: "sent" as const } : {}),
+            }
+          : {}),
         created_at: now,
       });
+      if (incoming) recordSimulatedInbound(data, data.messages.at(-1)!);
+    }
     if (incoming) {
       conversation.unread = true;
       notify(`Simulated ${conversation.channel} reply received`);

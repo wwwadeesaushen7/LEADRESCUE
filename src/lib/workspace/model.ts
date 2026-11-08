@@ -1,3 +1,4 @@
+import type { Simulation, SimulationCommand } from "@/lib/simulation/model";
 import { z } from "zod";
 import type { BusinessInput } from "@/lib/validation";
 export const leadStatuses = [
@@ -83,6 +84,8 @@ export type Message = {
   direction: "inbound" | "outbound";
   status: "draft" | "simulated";
   created_at: string;
+  simulation_call_id?: string;
+  delivery_status?: "queued" | "sent" | "delivered" | "failed" | "canceled";
 };
 export type Notice = {
   id: string;
@@ -92,6 +95,7 @@ export type Notice = {
   created_at: string;
 };
 export type WorkspaceData = {
+  simulation?: Simulation;
   business: BusinessInput;
   leads: Lead[];
   appointments: Appointment[];
@@ -100,6 +104,7 @@ export type WorkspaceData = {
   notifications: Notice[];
 };
 export type Command =
+  | { action: "simulation"; data: SimulationCommand }
   | { action: "saveLead"; id?: string; data: LeadInput }
   | { action: "saveAppointment"; id?: string; data: AppointmentInput }
   | { action: "createConversation"; data: z.infer<typeof conversationSchema> }

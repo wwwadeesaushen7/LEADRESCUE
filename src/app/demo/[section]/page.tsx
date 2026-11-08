@@ -9,6 +9,7 @@ export default async function Page({
 }) {
   const { section } = await params;
   const sections: Record<string, Section> = {
+    simulator: "Recovery demo",
     leads: "Leads",
     inbox: "Inbox",
     appointments: "Appointments",

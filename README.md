@@ -2,7 +2,7 @@
 
 **Never lose a customer to a missed call again.**
 web link - https://leadrescue-nu.vercel.app
-A Next.js, React, TypeScript and Tailwind SaaS foundation for consent-based WhatsApp and SMS missed-call recovery. This repository implements **Phases 1–2** of the requested build: authentication, business setup, leads, a draft inbox, appointments, notifications, and a separate interactive demo. Real calls, WhatsApp/SMS sending, and billing are not connected.
+A Next.js, React, TypeScript and Tailwind SaaS foundation for consent-based WhatsApp and SMS missed-call recovery. This repository implements **Phases 1–3** of the requested build: authentication, business setup, leads, a draft inbox, appointments, notifications, and a complete separate recovery simulator. Real calls, WhatsApp/SMS sending, and billing are not connected.
 
 ## Just want to use the app?
 
@@ -20,9 +20,9 @@ npm run dev
 
 On your own machine, open `http://localhost:3000`. Choose **Watch demo**, or open `/demo`. No environment variables, Twilio purchases, account creation, or API payments are necessary for the demo.
 
-Open **Settings** in the demo to change the name, timezone, and hours. The Next.js `/api/demo` route validates the request and saves your demo preferences in an HTTP-only, same-site browser cookie for seven days. Reloading retains the business; another browser gets a separate demo. Demo leads, conversations, and appointments are saved in browser local storage. Dashboard call data is fictional and labeled. Leads can be added and edited, conversations simulated, appointments booked or canceled, and business settings saved.
+Open **Settings** in the demo to change the name, timezone, and hours. The Next.js `/api/demo` route validates the request and saves your demo preferences in an HTTP-only, same-site browser cookie for seven days. Reloading retains the business; another browser gets a separate demo. Demo leads, conversations, and appointments are saved in browser local storage. Demo dashboard calls come from your simulator actions and are explicitly labeled. Leads can be added and edited, conversations simulated, appointments booked or canceled, and business settings saved.
 
-The full incoming-call/recovery/booking simulator will be built in Phase 3. Demo preferences contain no credentials and authorize no live data. Avoid entering sensitive information in a demo.
+Open `/demo/simulator` for the full incoming-call → follow-up → customer reply → booking → manually confirmed win flow. See [the simulator guide](docs/PHASE_3_DEMO.md). No additional SQL migration or environment variable is needed for Phase 3. Demo preferences contain no credentials and authorize no live data. Avoid entering sensitive information in a demo.
 
 ## What is implemented
 
@@ -39,7 +39,7 @@ The full incoming-call/recovery/booking simulator will be built in Phase 3. Demo
 - Lead/appointment notifications, mark-as-read, and dashboard counts derived from saved customer records.
 - Owner-only business/hour editing and worldwide timezone selection. Working hours are informational; manual bookings can be outside those hours.
 - Floating illustrations, animated counters, card/message transitions, and a persistent animation pause control. Device reduced-motion settings are respected.
-- Demo onboarding/dashboard with explicitly simulated activity; live dashboards never substitute fake data.
+- Complete browser-local recovery simulator: call outcomes, consent controls, per-channel eligibility, template/window rules, independent SMS fallback, explicit delivery/reply/STOP actions, delays, duplicate event handling, booking and manually confirmed wins. Demo charts derive from call events; live dashboards never substitute fake data.
 - Subscription-ready storage and provisional pricing; **no payments or messaging are active**.
 
 ## Architecture
@@ -49,7 +49,7 @@ Browser → Next.js pages and API routes → Supabase Auth + PostgreSQL/RLS
         → Separate demo pages/API      → Demo cookie + browser-local records
 ```
 
-`src/app` contains pages/API routes. `src/components` contains reusable UI. `src/lib/auth` enforces live authentication; `src/lib/supabase` creates the cookie-aware server client. `src/lib/demo` contains fixture data and demo preferences; `src/lib/workspace` contains the business models, database loader, and isolated demo reducer. Shared Zod schemas validate business/auth inputs. `supabase/migrations` defines database tables, RLS, and the business-creation transaction. Tests are separated into adapter/unit, database, and browser tests.
+`src/app` contains pages/API routes. `src/components` contains reusable UI. `src/lib/auth` enforces live authentication; `src/lib/supabase` creates the cookie-aware server client. `src/lib/demo` contains fixture data and demo preferences; `src/lib/workspace` contains the business models, database loader, and isolated demo reducer. `src/lib/recovery/policy.ts` is the pure eligibility policy; `src/lib/simulation` contains the local call state machine and activity aggregation. It imports no provider client and performs no network calls. Shared Zod schemas validate inputs. `supabase/migrations` defines database tables, RLS, and the business-creation transaction. Tests are separated into adapter/unit, database, and browser tests.
 
 No admin/service-role key is needed for the current application. Database requests use the caller's session and remain subject to RLS. Members cannot grant themselves access or edit subscription status. Automatic recovery is disabled by a database constraint until its consent and sender verification workflow exists.
 
@@ -89,7 +89,8 @@ The browser suite runs the app without Supabase credentials; use an unconfigured
 - `tests/auth.test.ts`: mocked Supabase adapter; unauthorized/unverified access, cross-origin requests, signup and reset handling. **Not a real email integration test.**
 - `tests/isolation.test.ts`: executes both actual SQL migrations and tenant policies against embedded PostgreSQL (PGlite), with a small simulated Supabase `auth` schema. Tests forged memberships, cross-business writes, private profiles, idempotent setup, messaging and subscription gates, linked-record isolation, drafts-only constraints, notification permissions, owner-only business updates, and appointment conflicts.
 - `tests/workspace.test.ts` and `tests/workspace-api.test.ts`: timezone/DST behavior, CSV safety, demo operations, API scoping, validation, and unsent-draft enforcement.
-- `tests/e2e`: real Next.js desktop/mobile flows, lead editing/export, inbox drafts/simulations, appointments, settings, reduced motion, demo persistence/isolation, chart/search controls, and route protection. **No Twilio traffic.**
+- `tests/recovery.test.ts` and `tests/simulation.test.ts`: channel eligibility, exact 24-hour window, consent and opt-outs, dispatch rechecks, duplicates, failure outcomes, cross-screen workflow linking, and timezone-based call analytics.
+- `tests/e2e`: real Next.js desktop/mobile flows, lead editing/export, inbox drafts/simulations, appointments, settings, reduced motion, demo persistence/isolation, chart/search controls, and route protection. The complete simulator journey is guarded against external HTTP requests and any `/api/workspace` access. **No Twilio traffic.**
 
 ## Deployment on Vercel
 
@@ -102,6 +103,6 @@ The demo uses a cookie for business preferences and local storage for simulated 
 
 ## Next steps
 
-Apply the Phase 2 database update and verify the hosted workflows before continuing to the complete recovery simulator in Phase 3. See [the development plan](docs/ROADMAP.md) and [provider/deployment preparation](docs/INTEGRATIONS.md).
+Try the [Phase 3 recovery simulator](docs/PHASE_3_DEMO.md). Phase 4 will add phone forwarding and missed-call detection; Phase 5 will add real messaging and a durable worker. See [the development plan](docs/ROADMAP.md) and [provider/deployment preparation](docs/INTEGRATIONS.md).
 
 Current boundaries: one business workspace and one appointment calendar; no team invites, workspace switcher, real messaging, Twilio webhooks, payments, or AI. The inbox assignee is a name label, not a permission or notification recipient. Records can be edited and appointments canceled; destructive deletion is not exposed. The workspace loader fetches batches of 1,000 records and stops with an error at 10,000 per table; server-side filtered views are needed before that scale. Live call analytics remain empty until provider integrations exist.

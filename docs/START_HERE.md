@@ -10,6 +10,14 @@ The inbox currently saves drafts. It does not send WhatsApp messages or SMS. Con
 
 Choose **Watch demo** on the home page to explore fictional customers and simulate conversations without contacting anyone. Demo records stay in that browser; your logged-in business records are stored in your Supabase project.
 
+## Try a complete missed-call recovery
+
+Open [Recovery demo](https://leadrescue-nu.vercel.app/demo/simulator). Choose **Prepare test case**, start an incoming call, and finish it as not answered. Then simulate delivery and a customer reply, book a demo appointment, and mark the lead as won.
+
+The results update as you go. You can also try SMS fallback, missing permission, STOP, failed delivery, and duplicate calls. [Follow the step-by-step guide](PHASE_3_DEMO.md).
+
+**No new database script or account setup is needed for this update.** Your logged-in business remains separate from these fictional tests.
+
 ## Install it as an app
 
 Open [Get the app](https://leadrescue-nu.vercel.app/install) and follow the instructions for your device:

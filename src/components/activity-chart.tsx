@@ -1,11 +1,23 @@
 "use client";
 import { useState } from "react";
+import {
+  simulationActivity,
+  type ActivityPeriod,
+} from "@/lib/simulation/activity";
+import type { WorkspaceData } from "@/lib/workspace/model";
 import { demoActivity } from "@/lib/demo/data";
-export function ActivityChart({ demo = true }: { demo?: boolean }) {
-  const [period, setPeriod] = useState("Week");
+export function ActivityChart({
+  demo = true,
+  workspace,
+}: {
+  demo?: boolean;
+  workspace?: WorkspaceData;
+}) {
+  const [period, setPeriod] = useState<ActivityPeriod>("Week");
   const [selected, setSelected] = useState<number | null>(null);
-  const data =
-    period === "Day"
+  const data = workspace
+    ? simulationActivity(workspace, period)
+    : period === "Day"
       ? ["9am", "11am", "1pm", "3pm", "5pm", "7pm", "9pm"].map((day, i) => ({
           day,
           calls: [4, 8, 6, 11, 7, 3, 1][i],
@@ -19,7 +31,10 @@ export function ActivityChart({ demo = true }: { demo?: boolean }) {
             recovered: d.recovered * 3,
           }))
         : demoActivity;
-  const max = period === "Month" ? 120 : period === "Day" ? 12 : 40;
+  const max = Math.max(
+    4,
+    Math.ceil(Math.max(...data.map((d) => d.calls)) / 4) * 4,
+  );
   return (
     <section className="card chart-card">
       <div className="section-heading">
@@ -27,12 +42,14 @@ export function ActivityChart({ demo = true }: { demo?: boolean }) {
           <h3>Every conversation counts</h3>
           <p>
             {demo
-              ? "Illustrative activity for your demo business"
+              ? workspace
+                ? `Simulated calls · ${workspace.business.timezone}`
+                : "Illustrative sample activity"
               : "Your call activity will appear here"}
           </p>
         </div>
         <div className="segmented" aria-label="Activity period">
-          {["Day", "Week", "Month"].map((p) => (
+          {(["Day", "Week", "Month"] as const).map((p) => (
             <button
               key={p}
               aria-pressed={p === period}
@@ -56,7 +73,15 @@ export function ActivityChart({ demo = true }: { demo?: boolean }) {
           <i className="dot pale" />
           Recovery attempts
         </span>
-        <small>{demo ? "Sample data" : "No integration connected"}</small>
+        <small>
+          {demo
+            ? !workspace
+              ? "Sample data"
+              : period === "Month"
+                ? workspace.simulation?.clock.slice(0, 7)
+                : "Your demo session"
+            : "No integration connected"}
+        </small>
       </div>
       <div className="chart-area">
         <div className="chart-axis">

@@ -287,9 +287,11 @@ function Thread({ conversation: c }: { conversation: Conversation }) {
             >
               <p>{m.body}</p>
               <small>
-                {m.status === "draft" ? "Draft · not sent" : "Simulated"} ·{" "}
-                {displayTime(m.created_at, data.business.timezone)}
-                {m.direction === "outbound" && (
+                {m.status === "draft"
+                  ? "Draft · not sent"
+                  : `Simulated${m.delivery_status ? " · " + m.delivery_status : ""}`}{" "}
+                · {displayTime(m.created_at, data.business.timezone)}
+                {m.direction === "outbound" && !m.simulation_call_id && (
                   <button
                     className="icon-button"
                     aria-label={`Edit ${m.status === "draft" ? "draft" : "message"}: ${m.body.slice(0, 35)}`}
